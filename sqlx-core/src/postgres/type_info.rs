@@ -115,6 +115,8 @@ pub enum PgType {
     JsonpathArray,
     Money,
     MoneyArray,
+    Uint8,
+    Uint8Array,
 
     // https://www.postgresql.org/docs/9.3/datatype-pseudo.html
     Void,
@@ -325,6 +327,8 @@ impl PgType {
             3927 => PgType::Int8RangeArray,
             4072 => PgType::Jsonpath,
             4073 => PgType::JsonpathArray,
+            36804 => PgType::Uint8,
+            36809 => PgType::Uint8Array,
 
             _ => {
                 return None;
@@ -433,6 +437,9 @@ impl PgType {
             PgType::Int8RangeArray => 3927,
             PgType::Jsonpath => 4072,
             PgType::JsonpathArray => 4073,
+            PgType::Uint8 => 36804,
+            PgType::Uint8Array => 36809,
+
             PgType::Custom(ty) => ty.oid,
 
             PgType::DeclareWithOid(oid) => *oid,
@@ -535,6 +542,8 @@ impl PgType {
             PgType::JsonpathArray => "JSONPATH[]",
             PgType::Money => "MONEY",
             PgType::MoneyArray => "MONEY[]",
+            PgType::Uint8 => "UINT8",
+            PgType::Uint8Array => "UINT8[]",
             PgType::Void => "VOID",
             PgType::Custom(ty) => &*ty.name,
             PgType::DeclareWithOid(_) => "?",
@@ -635,6 +644,8 @@ impl PgType {
             PgType::JsonpathArray => "_jsonpath",
             PgType::Money => "money",
             PgType::MoneyArray => "_money",
+            PgType::Uint8 => "uint8",
+            PgType::Uint8Array => "_uint8",
             PgType::Void => "void",
             PgType::Custom(ty) => &*ty.name,
             PgType::DeclareWithOid(_) => "?",
@@ -735,6 +746,8 @@ impl PgType {
             PgType::JsonpathArray => &PgTypeKind::Array(PgTypeInfo(PgType::Jsonpath)),
             PgType::Money => &PgTypeKind::Simple,
             PgType::MoneyArray => &PgTypeKind::Array(PgTypeInfo(PgType::Money)),
+            PgType::Uint8 => &PgTypeKind::Simple,
+            PgType::Uint8Array => &PgTypeKind::Array(PgTypeInfo(PgType::Uint8)),
 
             PgType::Void => &PgTypeKind::Pseudo,
 
@@ -863,6 +876,9 @@ impl PgTypeInfo {
     // large-range integer; -9223372036854775808 to +9223372036854775807
     pub(crate) const INT8: Self = Self(PgType::Int8);
     pub(crate) const INT8_ARRAY: Self = Self(PgType::Int8Array);
+
+    pub(crate) const UINT8: Self = Self(PgType::Uint8);
+    pub(crate) const UINT8_ARRAY: Self = Self(PgType::Uint8Array);
 
     // variable-precision, inexact, 6 decimal digits precision
     pub(crate) const FLOAT4: Self = Self(PgType::Float4);

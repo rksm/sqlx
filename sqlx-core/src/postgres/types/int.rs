@@ -178,3 +178,39 @@ impl Decode<'_, Postgres> for i64 {
         })
     }
 }
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+impl Type<Postgres> for u64 {
+    fn type_info() -> PgTypeInfo {
+        PgTypeInfo::UINT8
+    }
+}
+
+impl Type<Postgres> for [u64] {
+    fn type_info() -> PgTypeInfo {
+        PgTypeInfo::UINT8_ARRAY
+    }
+}
+
+impl Type<Postgres> for Vec<u64> {
+    fn type_info() -> PgTypeInfo {
+        <[u64] as Type<Postgres>>::type_info()
+    }
+}
+
+impl Encode<'_, Postgres> for u64 {
+    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> IsNull {
+        buf.extend(&self.to_be_bytes());
+        IsNull::No
+    }
+}
+
+impl Decode<'_, Postgres> for u64 {
+    fn decode(value: PgValueRef<'_>) -> Result<Self, BoxDynError> {
+        Ok(match value.format() {
+            PgValueFormat::Binary => BigEndian::read_u64(value.as_bytes()?),
+            PgValueFormat::Text => value.as_str()?.parse()?,
+        })
+    }
+}
